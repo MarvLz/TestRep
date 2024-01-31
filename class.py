@@ -63,4 +63,39 @@ def aendere_dateiendung_zu_eml(alter_pfad):
 alter_pfad = '/pfad/zur/aktuellen_datei.xyz'
 aendere_dateiendung_zu_eml(alter_pfad)
 
-#
+# Auslesen einer Zeile
+import email
+import email.policy
+
+def extract_line_from_email(eml_file_path, line_number):
+    try:
+        with open(eml_file_path, 'r', encoding='utf-8') as file:
+            msg = email.message_from_file(file, policy=email.policy.default)
+
+            # Ermittle den Inhaltstyp der E-Mail
+            if msg.is_multipart():
+                for part in msg.walk():
+                    content_type = part.get_content_type()
+                    if content_type == "text/plain":
+                        # Extrahiere den Text-Inhalt
+                        text = part.get_payload(decode=True).decode()
+                        break
+            else:
+                # Für einfache Nachrichten ohne Teile
+                text = msg.get_payload(decode=True).decode()
+
+            # Zeilenweise aufteilen und die spezifische Zeile extrahieren
+            lines = text.splitlines()
+            if line_number < len(lines):
+                specific_line = lines[line_number]
+                print("Gesuchte Zeile:", specific_line)
+            else:
+                print("Zeilennummer ist außerhalb des Bereichs der E-Mail.")
+
+    except Exception as e:
+        print(f"Fehler beim Lesen der E-Mail: {e}")
+
+eml_path = 'pfad/zu/deiner/email.eml'
+line_number = 10  # Die Zeilennummer, die du extrahieren möchtest (beginnend mit 0)
+
+extract_line_from_email(eml_path, line_number)
